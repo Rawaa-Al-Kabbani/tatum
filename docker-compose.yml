@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        VITE_TATUM_API_KEY: ${VITE_TATUM_API_KEY}
+    ports:
+      - 3000:80

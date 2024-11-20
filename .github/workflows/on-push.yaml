@@ -1,0 +1,43 @@
+name: On push
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.17.0
+      - run: npm ci
+      - run: npm run format
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.17.0
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.17.0
+      - run: docker compose up -d
+        env:
+          VITE_TATUM_API_KEY: ${{ secrets.TATUM_API_KEY }}
+      - run: docker logs $(docker ps -q)
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      - run: npm run test
+      - run: docker compose down
